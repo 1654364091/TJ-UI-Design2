@@ -1,0 +1,117 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <!-- import vue-->
+        <script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+        <!-- import CSS -->
+        <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.8/lib/theme-chalk/index.css">
+        <!-- import JavaScript -->
+        <script src="https://unpkg.com/element-ui@2.15.8/lib/index.js"></script>
+        <!--    本页面样式-->
+        <link rel="stylesheet" href="{{url_for('static',filename='css/index.css')}}">
+        <link rel="stylesheet" href="../static/css/index.css">
+
+        <title>主页-相似图片搜索</title>
+    </head>
+
+    <body style="margin: 0;">
+        <div id="box" style="text-align: center;">
+<!--            导航栏-->
+            <el-menu :default-active="'1'"
+                  :default-active="activeIndex2"
+                  class="el-menu-demo"
+                  mode="horizontal"
+                  @select="handleSelect"
+                  background-color="#545c64"
+                  text-color="#fff"
+                  active-text-color="#ffd04b">
+                <div style="text-align: center;">
+                    <el-menu-item index="1" style="display:inline-block">首页</el-menu-item>
+                    <a href="{{ url_for('favorite') }}">
+                        <el-menu-item index="2" style="display:inline-block">收藏夹</el-menu-item>
+                    </a>
+                </div>
+            </el-menu>
+    <!--            导航栏结束-->
+
+            <div id ="box2" v-loading="loading"
+                        element-loading-text="正在搜索相似图片，请稍等几秒钟^_^"
+                        element-loading-spinner="el-icon-loading"
+                        element-loading-background="rgba(0, 0, 0, 0.8)">
+    <!--            文件上传-->
+                <el-row >
+                    <el-col :span="7"><div class="grid-content "></div></el-col>
+                    <el-col :span="10">
+
+                        <el-upload
+                              class="upload-demo"
+                              ref="upload"
+                              action="http://127.0.0.1:5000/imgUpload"
+                              :on-preview="handlePreview"
+                              :on-remove="handleRemove"
+                              :on-change="change"
+                              :file-list="fileList"
+                              :auto-upload="false"
+                              :limit="1"
+                              :on-exceed="onExceed"
+                              :http-request="uploadFile"
+                              list-type="picture">
+                              <el-button slot="trigger" type="primary" style="margin: 25px">选取文件</el-button>
+                              <el-button type="success" style="margin: 25px" @click="uploadFile">搜索</el-button>
+
+                              <el-input  v-model="k" style=" width: 50px"  placeholder="请输入内容"></el-input>
+                              <span style="font-size: 13px;">张相似图片</span>
+
+                              <div slot="tip" class="el-upload__tip">请上传一张您想搜索的图片，然后点击“搜索”即可搜索相似图片</div>
+                              <div slot="tip" class="el-upload__tip" style="color: palevioletred">一次最多上传一张图片，点击图片框右上角的❌可以取消上传当前图片</div>
+                        </el-upload>
+
+                    </el-col>
+                    <el-col :span="7"><div class="grid-content "></div></el-col>
+                </el-row>
+    <!--            文件上传结束-->
+
+<!--                筛选条件-->
+                    <el-divider></el-divider>
+                    <span style="color:cornflowerblue">高级筛选条件：</span><br><br>
+                     <el-checkbox-group v-model="tag_list">
+                        <el-checkbox v-for="item in checkbox" :label="item"></el-checkbox>
+                      </el-checkbox-group>
+                    <el-divider></el-divider>
+<!--                </div>-->
+<!--                筛选条件结束-->
+                </div>
+
+                <!--            展示查询结果-->
+                <span style="color: lightslategray" v-if="images.length>0">最近一次的搜索结果如下
+                    <span style="font-size: 14px;color: lightslategray" v-if="images.length>0">
+                        (已为您搜索到<em style="color: crimson"> ##images.length## </em>张相关图片)
+                    </span>
+                </span>
+                <span> &nbsp; &nbsp;</span>
+                <el-button v-if="images.length>0" type="info" round @click="clear" size="mini">清除</el-button>
+                    <br><br>
+                <el-row v-for="i in rows" type="flex" class="row-bg" justify="space-around">
+                    <!--            循环cols列-->
+                    <el-col v-for="j in cols" :span="6">
+                        <div class="grid-content bg-purple" v-if="(i-1)*cols+j-1<images.length"
+                        style = "margin: 20px">
+                             <img :src="images[(i-1)*cols+j-1]" alt="Norway" style="width:100%; height:300px; max-width:100%; max-height:100%;">
+                             <div style="text-align:center">
+                                 <el-button @click="addFavoriteImage(images[(i-1)*cols+j-1])" type="warning" icon="el-icon-star-off" circle></el-button>
+                             </div>
+                        </div>
+                    </el-col>
+                </el-row>
+            </div>
+
+
+
+
+
+
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script src="{{url_for('static',filename='js/index.js')}}"></script>
+        <script src="../static/js/index.js"></script>
+    </body>
+</html>
